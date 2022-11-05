@@ -21,15 +21,7 @@ fn main() -> ! {
     let (mut tx, rx) = serial.split();
     let mut stdout = Stdout(&mut tx);
 
-    // Configure UART
-    // let serial = p.UARTHS.constrain(115_200.bps(), &clocks);
-    // let (mut tx, _) = serial.split();
-
-    // let mut stdout = Stdout(&mut tx);
-
-    // writeln!(stdout, "Hello, Rust!").unwrap();
-
     loop {
-        writeln!(stdout, "Hello again!").unwrap();
+        writeln!(stdout, "Hello world!").unwrap();
     }
 }
