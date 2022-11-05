@@ -1,0 +1,10 @@
+[package]
+name = "k210"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+panic-halt = "0.2.0"
+k210-hal = { git="https://github.com/riscv-rust/k210-hal", rev = "fb6c2394"}
+riscv-rt = { git="https://github.com/rust-embedded/riscv-rt", rev = "91d63a31"}
+riscv = { git="https://github.com/rust-embedded/riscv", rev = "462b5509"}
