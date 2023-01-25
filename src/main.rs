@@ -1,35 +1,45 @@
-#![allow(warnings)]
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
+use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::v2::ToggleableOutputPin;
+use k210_hal::{fpioa, gpio::Gpio, pac, prelude::*};
+use panic_halt as _;
 
-use k210_hal::stdout;
-use riscv_rt::entry;
-use k210_hal::prelude::*;
-use k210_hal::pac as pac;
-use k210_hal::stdout::Stdout;
-
-#[entry]
+#[riscv_rt::entry]
 fn main() -> ! {
-    let p = pac::Peripherals::take().unwrap();
+    let p = unsafe { pac::Peripherals::steal() };
 
-    // Configure clocks (TODO)
-    let clocks = k210_hal::clock::Clocks::new();
+    let mut sysctl = p.SYSCTL.constrain();
+    let fpioa = p.FPIOA.split(&mut sysctl.apb0);
+    let gpio = p.GPIO.split(&mut sysctl.apb0);
+    let io12 = fpioa.io12.into_function(fpioa::GPIO7);
+    let io13 = fpioa.io13.into_function(fpioa::GPIO5);
+    let io14 = fpioa.io14.into_function(fpioa::GPIO6);
+    let mut green = Gpio::new(gpio.gpio7, io12).into_push_pull_output();
+    let mut red = Gpio::new(gpio.gpio5, io13).into_push_pull_output();
+    let mut blue = Gpio::new(gpio.gpio6, io14).into_push_pull_output();
 
-    let serial = p.UARTHS.configure(115_200.bps(), &clocks);
-    let (mut tx, rx) = serial.split();
-    let mut stdout = Stdout(&mut tx);
+    red.set_high().unwrap();
+    green.set_high().unwrap();
+    blue.set_high().unwrap();
 
-    // Configure UART
-    // let serial = p.UARTHS.constrain(115_200.bps(), &clocks);
-    // let (mut tx, _) = serial.split();
-
-    // let mut stdout = Stdout(&mut tx);
-
-    // writeln!(stdout, "Hello, Rust!").unwrap();
-
+    let mut last_update = riscv::register::mcycle::read();
+    let mut i = 0;
     loop {
-        writeln!(stdout, "Hello again!").unwrap();
+        let cur = riscv::register::mcycle::read();
+        if cur - last_update >= 100_000_000 {
+            last_update = cur;
+
+            red.toggle().unwrap();
+            if i % 2 == 0 {
+              green.toggle().unwrap();
+            }
+            if i % 3 == 0 {
+              blue.toggle().unwrap();
+            }
+
+            i += 1;
+        }
     }
 }

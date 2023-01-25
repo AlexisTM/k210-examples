@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-panic-halt = "0.2.0"
-k210-hal = { git="https://github.com/riscv-rust/k210-hal", rev = "fb6c2394"}
-riscv-rt = { git="https://github.com/rust-embedded/riscv-rt", rev = "91d63a31"}
-riscv = { git="https://github.com/rust-embedded/riscv", rev = "462b5509"}
+panic-halt = "0.2"
+embedded-hal = "0.2"
+k210-pac = { git="https://github.com/AlexisTM/k210-pac", branch = "feature/svd_0_28_0"}
+k210-hal = { git="https://github.com/riscv-rust/k210-hal", rev="fb6c239" } # aka master
+riscv-rt = "0.11"
+riscv = "0.10"
